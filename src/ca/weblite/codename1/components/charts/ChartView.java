@@ -70,7 +70,8 @@ public class ChartView extends Container {
             }
             
         });
-        browser.setURL("jar:///ca/weblite/codename1/components/flot/resources/flot.html");
+        //browser.setURL("jar:///ca/weblite/codename1/components/flot/resources/flot.html");
+        browser.setPage(new Resources().getFlotHtml(), "jar:///ca/weblite/codename1/components/flot/resources/flot.html");
     }
     
     public void initLater(Runnable afterInit){
