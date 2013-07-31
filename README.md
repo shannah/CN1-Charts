@@ -25,6 +25,15 @@ and exposing it's configuration options and methods as a Java API.
 server currently doesn't support.  See [issue 809](https://code.google.com/p/codenameone/issues/detail?id=809)).
 4. Not tested on Windows Phone but likely won't work due to same [issue 809](https://code.google.com/p/codenameone/issues/detail?id=809).
 
+##Download
+
+* [CN1Charts.cn1lib](https://github.com/shannah/CN1-Charts/raw/master/dist/CN1Charts.cn1lib)
+
+##Installation
+
+1. Copy the [CN1Charts.cn1lib](https://github.com/shannah/CN1-Charts/raw/master/dist/CN1Charts.cn1lib) library into your project's lib directory.
+2. Install the [Codename One Javascript Bridge](https://github.com/shannah/CodenameOneJS)
+
 ##Usage
 
 The general usage of this chart involves:
@@ -34,6 +43,8 @@ The general usage of this chart involves:
 3. Add the ChartView to the component hierarchy.
 
 E.g. Creating a Pie Chart
+
+![Pie Chart](https://github.com/shannah/CN1-Charts/raw/master/screenshots/piechart.png)
 
     Form hi = new Form("Pie Chart");
     hi.setLayout(new BorderLayout());
@@ -48,6 +59,8 @@ E.g. Creating a Pie Chart
     hi.show();
 
 E.g. Creating a Bar Chart
+
+![Bar Chart](https://github.com/shannah/CN1-Charts/raw/master/screenshots/multibarchart.png)
 
     Form hi = new Form("Bar Chart");
     hi.setLayout(new BorderLayout());
@@ -105,8 +118,8 @@ to look at examples of the Flot javascript library and translate them directly t
 
 ##Documentation
 
-*Javadocs
-*[Flot Documentation](https://github.com/flot/flot/blob/master/API.md)
+* [Javadocs](https://rawgithub.com/shannah/CN1-Charts/master/dist/javadoc/index.html)
+* [Flot Documentation](https://github.com/flot/flot/blob/master/API.md)
 
 ##Contact
 
