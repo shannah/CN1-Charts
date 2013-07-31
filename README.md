@@ -21,9 +21,8 @@ and exposing it's configuration options and methods as a Java API.
 
 1. Android.  Tested, Works.
 2. Java SE (i.e. in the simulator).  Tested, Works
-3. iOS Tested, Works (using [Offline build](http://sjhannah.com/blog/?p=228) only because it requires support for namespaced resources which the build
-server currently doesn't support.  See [issue 809](https://code.google.com/p/codenameone/issues/detail?id=809)).
-4. Not tested on Windows Phone but likely won't work due to same [issue 809](https://code.google.com/p/codenameone/issues/detail?id=809).
+3. iOS. Should work using both build server and  [Offline build](http://sjhannah.com/blog/?p=228).
+4. Windows Phone.  Not tested, but should work.  Please let me know if it doesn't!
 
 ##Download
 
