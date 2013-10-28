@@ -10,6 +10,12 @@ public class ChartView extends com.codename1.ui.Container {
 	public ChartView(Chart model) {
 	}
 
+	public void setChartModel(Chart model) {
+	}
+
+	public Chart getChartModel() {
+	}
+
 	public void initLater(Runnable afterInit) {
 	}
 
