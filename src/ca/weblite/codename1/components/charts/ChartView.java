@@ -8,6 +8,7 @@ package ca.weblite.codename1.components.charts;
 import ca.weblite.codename1.js.JSFunction;
 import ca.weblite.codename1.js.JSObject;
 import ca.weblite.codename1.js.JavascriptContext;
+import com.codename1.io.Log;
 import com.codename1.ui.BrowserComponent;
 import com.codename1.ui.Container;
 import com.codename1.ui.Display;
@@ -39,6 +40,14 @@ public class ChartView extends Container {
     }
     
     
+    public void setChartModel(Chart model){
+        this.chartModel = model;
+        
+    }
+    
+    public Chart getChartModel(){
+        return this.chartModel;
+    }
     
     
     
@@ -71,7 +80,7 @@ public class ChartView extends Container {
             
         });
         //browser.setURL("jar:///ca/weblite/codename1/components/flot/resources/flot.html");
-        browser.setPage(new Resources().getFlotHtml(), "jar:///ca/weblite/codename1/components/flot/resources/flot.html");
+        browser.setPage(new Resources().getFlotHtml(), null);
     }
     
     public void initLater(Runnable afterInit){
@@ -119,7 +128,12 @@ public class ChartView extends Container {
     
     
     public void update(){
-        JSObject data = this.createDataObject(chartModel);
+        JSObject window = (JSObject)c.get("window");
+        flotChart = (JSObject)window.call("init", new Object[]{createDataObject(chartModel),  createOptionsObject(chartModel.options())});
+        //JSObject data = this.createDataObject(chartModel);
+        //flotChart.call("setData", new Object[]{data});
+        //flotChart.call("setupGrid");
+        //flotChart.call("draw");
         
         
     }
@@ -128,7 +142,9 @@ public class ChartView extends Container {
     private JSObject createDataObject(Chart chartModel){
         JSObject data = (JSObject)c.get("[]");
         for ( Series s : chartModel.series() ){
+            //Log.p("Creating series object for seriese "+s);
             data.call("push", new Object[]{ createSeriesObject(s)});
+            //Log.p("Finished creating series object for series "+s);
         }
         
         

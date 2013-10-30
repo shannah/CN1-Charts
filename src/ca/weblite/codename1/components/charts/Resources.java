@@ -46,7 +46,7 @@ class Resources {
         sb.append("        <script>\n");
         sb.append("            var flot = null;\n");
         sb.append("            function init(data, options){\n");
-        sb.append("                $('#flot').height($(window).height());\n");
+        sb.append("                flot = null; $('#flot').text(''); $('#flot').height($(window).height());\n");
         sb.append("                $('#flot').width($(window).width());\n");
         sb.append("                if ( flot === null ){\n");
         sb.append("                    \n");
