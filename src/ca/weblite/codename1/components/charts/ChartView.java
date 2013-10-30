@@ -6,8 +6,8 @@
 package ca.weblite.codename1.components.charts;
 
 
-import ca.weblite.codename1.js.JSObject;
-import ca.weblite.codename1.js.JavascriptContext;
+//import ca.weblite.codename1.js.JSObject;
+//import ca.weblite.codename1.js.JavascriptContext;
 import com.codename1.io.Log;
 import com.codename1.ui.BrowserComponent;
 import com.codename1.ui.Container;
@@ -29,14 +29,14 @@ import org.json.me.JSONObject;
 public class ChartView extends Container {
     
     private BrowserComponent browser;
-    private JSObject flotChart;
+    //private JSObject flotChart;
     private Object lock = new Object();
     private boolean initialized = false;
     private boolean initializationError = false;
     private Exception initializationException = null;
     private Chart chartModel;
-    private JavascriptContext c;
-    
+    //private JavascriptContext c;
+    Object c;
     
     public ChartView(Chart model){
         this.chartModel = model;
@@ -66,12 +66,14 @@ public class ChartView extends Container {
 
             public void actionPerformed(ActionEvent evt) {
                 try {
-                    c = new JavascriptContext(browser);
+                    //c = new JavascriptContext(browser);
                     
-                    JSObject window = (JSObject)c.get("window");
-                    JSObject jsChartModel = (JSObject)c.get(createDataObject(chartModel).toString());
-                    JSObject jsChartModelOptions = (JSObject)c.get(createOptionsObject(chartModel.options()).toString());
-                    flotChart = (JSObject)window.call("init", new Object[]{jsChartModel,  jsChartModelOptions});
+                    //JSObject window = (JSObject)c.get("window");
+                    //JSObject jsChartModel = (JSObject)c.get(createDataObject(chartModel).toString());
+                    //JSObject jsChartModelOptions = (JSObject)c.get(createOptionsObject(chartModel.options()).toString());
+                    //flotChart = (JSObject)window.call("init", new Object[]{jsChartModel,  jsChartModelOptions});
+                    
+                    browser.execute("init("+createDataObject(chartModel).toString()+","+createOptionsObject(chartModel.options()).toString()+");");
                     initialized = true;
                     
                 } catch ( Exception ex){
@@ -134,10 +136,11 @@ public class ChartView extends Container {
     
     
     public void update(){
-        JSObject window = (JSObject)c.get("window");
-        JSObject jsChartModel = (JSObject)c.get(createDataObject(chartModel).toString());
-        JSObject jsChartModelOptions = (JSObject)c.get(createOptionsObject(chartModel.options()).toString());
-        flotChart = (JSObject)window.call("init", new Object[]{jsChartModel,  jsChartModelOptions});
+        browser.execute("init("+createDataObject(chartModel).toString()+","+createOptionsObject(chartModel.options()).toString()+");");
+        //JSObject window = (JSObject)c.get("window");
+        //JSObject jsChartModel = (JSObject)c.get(createDataObject(chartModel).toString());
+        //JSObject jsChartModelOptions = (JSObject)c.get(createOptionsObject(chartModel.options()).toString());
+        //flotChart = (JSObject)window.call("init", new Object[]{jsChartModel,  jsChartModelOptions});
         //JSObject data = this.createDataObject(chartModel);
         //flotChart.call("setData", new Object[]{data});
         //flotChart.call("setupGrid");
@@ -281,9 +284,9 @@ public class ChartView extends Container {
             if ( opts.xAxes().size() == 1 ){
                 set(out, "xaxis", opts.xAxes().get(0).toJS(c));
             } else {
-                JSObject xaxes = (JSObject)c.get("[]");
+                JSONArray xaxes = new JSONArray();
                 for ( Axis axis : opts.xAxes() ){
-                    xaxes.call("push", new Object[]{axis.toJS(c)});
+                    xaxes.put(axis.toJS(c));
                 }
                 set(out, "xaxes", xaxes);
            }
@@ -293,9 +296,9 @@ public class ChartView extends Container {
             if ( opts.yAxes().size() == 1 ){
                 set(out, "yaxis", opts.yAxes().get(0).toJS(c));
             } else {
-                JSObject yaxes = (JSObject)c.get("[]");
+                JSONArray yaxes = new JSONArray();
                 for ( Axis axis : opts.yAxes() ){
-                    yaxes.call("push", new Object[]{axis.toJS(c)});
+                    yaxes.put(axis.toJS(c));
                 }
                 set(out, "yaxes", yaxes);
            }
