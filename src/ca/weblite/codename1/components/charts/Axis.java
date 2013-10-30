@@ -6,10 +6,11 @@
 package ca.weblite.codename1.components.charts;
 
 import static ca.weblite.codename1.components.charts.JSUtil.set;
-import ca.weblite.codename1.js.JSObject;
-import ca.weblite.codename1.js.JavascriptContext;
+
 import com.codename1.ui.Font;
 import java.util.List;
+import org.json.me.JSONArray;
+import org.json.me.JSONObject;
 
 /**
  *
@@ -56,11 +57,11 @@ public class Axis {
         public Tick value(Double value){this.value=value; return this;}
         public Double value(){return value;}
         
-        Object toJS(JavascriptContext c){
+        Object toJS(Object c){
             if ( label != null ){
-                JSObject out = (JSObject)c.get("[]");
-                out.call("push", new Object[]{value});
-                out.call("push", new Object[]{label});
+                JSONArray out = new JSONArray();
+                out.put(value);
+                out.put(label);
                 return out;
             } else {
                 return value;
@@ -92,8 +93,8 @@ public class Axis {
     private Integer alignTicksWithAxis;
     
     
-    public JSObject toJS(JavascriptContext c){
-        JSObject out = (JSObject)c.get("{}");
+    public JSONObject toJS(Object c){
+        JSONObject out = new JSONObject();
         set(out, "show", show);
         set(out, "position", position);
         set(out, "mode", mode);
@@ -106,9 +107,9 @@ public class Axis {
         set(out, "autoscaleMargin", autoscaleMargin);
         set(out, "ticks", ticks);
         if ( ticksArr != null ){
-            JSObject ticksa = (JSObject)c.get("[]");
+            JSONArray ticksa = new JSONArray();
             for ( Tick t : ticksArr ){
-                ticksa.call("push", new Object[]{t.toJS(c)});
+                ticksa.put(t.toJS(c));
             
             }
             set(out, "ticks", ticksa);
@@ -117,9 +118,9 @@ public class Axis {
         set(out, "minTickSize", minTickSize);
         set(out, "tickSize", tickSize);
         if ( tickSizeArr != null ){
-            JSObject tickSizeA = (JSObject)c.get("[]");
+            JSONArray tickSizeA = new JSONArray();
             for ( Double d : tickSizeArr){
-                tickSizeA.call("push", new Object[]{d});
+                tickSizeA.put(d);
             }
             set(out, "tickSize", tickSizeA);
         }

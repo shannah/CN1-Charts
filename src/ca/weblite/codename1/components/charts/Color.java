@@ -5,8 +5,8 @@
 package ca.weblite.codename1.components.charts;
 
 import static ca.weblite.codename1.components.charts.JSUtil.set;
-import ca.weblite.codename1.js.JSObject;
-import ca.weblite.codename1.js.JavascriptContext;
+
+import org.json.me.JSONObject;
 
 /**
  *
@@ -41,14 +41,14 @@ public class Color {
     public Double brightness(){return brightness;}
     
     
-    Object toJS(JavascriptContext c){
+    Object toJS(Object c){
         Color color = this;
         
         if ( color.brightness() == null && color.opacity() == null ){
             
             return color.stringVal();
         } else {
-            JSObject out = (JSObject)c.get("{}");
+            JSONObject out = new JSONObject();
             set(out, "opacity", color.opacity());
             set(out, "brightness", color.brightness());
             return out;

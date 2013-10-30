@@ -5,7 +5,7 @@
  */
 package ca.weblite.codename1.components.charts;
 
-import ca.weblite.codename1.js.JSFunction;
+
 import ca.weblite.codename1.js.JSObject;
 import ca.weblite.codename1.js.JavascriptContext;
 import com.codename1.io.Log;
@@ -17,6 +17,10 @@ import com.codename1.ui.events.ActionListener;
 
 import com.codename1.ui.layouts.BorderLayout;
 import java.util.List;
+
+import org.json.me.JSONArray;
+import org.json.me.JSONException;
+import org.json.me.JSONObject;
 
 /**
  *
@@ -65,7 +69,9 @@ public class ChartView extends Container {
                     c = new JavascriptContext(browser);
                     
                     JSObject window = (JSObject)c.get("window");
-                    flotChart = (JSObject)window.call("init", new Object[]{createDataObject(chartModel),  createOptionsObject(chartModel.options())});
+                    JSObject jsChartModel = (JSObject)c.get(createDataObject(chartModel).toString());
+                    JSObject jsChartModelOptions = (JSObject)c.get(createOptionsObject(chartModel.options()).toString());
+                    flotChart = (JSObject)window.call("init", new Object[]{jsChartModel,  jsChartModelOptions});
                     initialized = true;
                     
                 } catch ( Exception ex){
@@ -129,7 +135,9 @@ public class ChartView extends Container {
     
     public void update(){
         JSObject window = (JSObject)c.get("window");
-        flotChart = (JSObject)window.call("init", new Object[]{createDataObject(chartModel),  createOptionsObject(chartModel.options())});
+        JSObject jsChartModel = (JSObject)c.get(createDataObject(chartModel).toString());
+        JSObject jsChartModelOptions = (JSObject)c.get(createOptionsObject(chartModel.options()).toString());
+        flotChart = (JSObject)window.call("init", new Object[]{jsChartModel,  jsChartModelOptions});
         //JSObject data = this.createDataObject(chartModel);
         //flotChart.call("setData", new Object[]{data});
         //flotChart.call("setupGrid");
@@ -139,11 +147,12 @@ public class ChartView extends Container {
     }
     
     
-    private JSObject createDataObject(Chart chartModel){
-        JSObject data = (JSObject)c.get("[]");
+    private JSONArray createDataObject(Chart chartModel){
+        JSONArray data = new JSONArray();
         for ( Series s : chartModel.series() ){
             //Log.p("Creating series object for seriese "+s);
-            data.call("push", new Object[]{ createSeriesObject(s)});
+            data.put(createSeriesObject(s));
+            //data.call("push", new Object[]{ createSeriesObject(s)});
             //Log.p("Finished creating series object for series "+s);
         }
         
@@ -151,17 +160,21 @@ public class ChartView extends Container {
         return data;
     }
     
-    static void set(JSObject obj, String key, Object val){
+    static void set(JSONObject obj, String key, Object val){
         if ( val != null ){
-            obj.set(key, val);
+            try {
+                obj.put(key, val);
+            } catch (JSONException ex) {
+                Log.e(ex);
+            }
         }
     }
     
-    private JSObject createSeriesObject(Series s){
+    private JSONObject createSeriesObject(Series s){
         if ( s == null ){
             return null;
         }
-        JSObject out = (JSObject)c.get("{}");
+        JSONObject out = new JSONObject();
         if ( s.color() != null ) set(out, "color", s.color().toJS(c));
         set(out, "data", createRawDataForSeries(s.data()) );
         set(out, "label", s.label());
@@ -178,14 +191,18 @@ public class ChartView extends Container {
         return out;
     }
     
-    private Object createRawDataForSeries(List<Point> points){
+    private JSONArray createRawDataForSeries(List<Point> points){
         //if ( points.size() > 0 ){
-            JSObject out = (JSObject)c.get("[]");
+            JSONArray out = new JSONArray();
             for ( Point p : points ){
-                JSObject pt = (JSObject)c.get("[]");
-                pt.call("push", new Object[]{new Double(p.x)});
-                pt.call("push", new Object[]{new Double(p.y)});
-                out.call("push", new Object[]{pt});
+                try {
+                    JSONArray pt = new JSONArray();
+                    pt.put(p.x);
+                    pt.put(p.y);
+                    out.put(pt);
+                } catch (JSONException ex) {
+                    Log.e(ex);
+                }
             }
             return out;
         //} else {
@@ -196,11 +213,11 @@ public class ChartView extends Container {
         
     }
     
-    private JSObject createLinesConfig(Line line){
+    private JSONObject createLinesConfig(Line line){
         if ( line == null ){
             return null;
         }
-        JSObject out = (JSObject)c.get("{}");
+        JSONObject out = new JSONObject();
         set(out, "show", line.show());
         set(out, "lineWidth", line.lineWidth());
         set(out, "fill", line.fill());
@@ -210,41 +227,52 @@ public class ChartView extends Container {
         return out;
     }
     
-    private JSObject createBarsConfig(Bar bar){
-        if ( bar == null ){
+    private JSONObject createBarsConfig(Bar bar){
+        try {
+            if ( bar == null ){
+                return null;
+            }
+            JSONObject out = new JSONObject();
+            set(out, "show", bar.show());
+            set(out, "lineWidth", bar.lineWidth());
+            set(out, "fill", bar.fill());
+            if ( bar.fillColor() != null ) set(out, "fillColor", bar.fillColor().toJS(c));
+            set(out, "zero", bar.zero());
+            set(out, "barWidth", bar.barWidth());
+            if ( bar.align() != null ) out.put("align", bar.align().toString());
+            set(out, "horizontal", bar.horizontal());
+            return out;
+        } catch (JSONException ex) {
+            Log.e(ex);
             return null;
         }
-        JSObject out = (JSObject)c.get("{}");
-        set(out, "show", bar.show());
-        set(out, "lineWidth", bar.lineWidth());
-        set(out, "fill", bar.fill());
-        if ( bar.fillColor() != null ) set(out, "fillColor", bar.fillColor().toJS(c));
-        set(out, "zero", bar.zero());
-        set(out, "barWidth", bar.barWidth());
-        if ( bar.align() != null ) out.set("align", bar.align().toString());
-        set(out, "horizontal", bar.horizontal());
-        return out;
+        
     }
     
-    private JSObject createPointsConfig(ChartPoint point){
-        if ( point == null) {
+    private JSONObject createPointsConfig(ChartPoint point){
+        try {
+            if ( point == null) {
+                return null;
+            }
+            JSONObject out = new JSONObject();
+            set(out, "show", point.show());
+            set(out, "lineWidth", point.lineWidth());
+            set(out, "fill", point.fill());
+            if ( point.fillColor() != null ) set(out, "fillColor", point.fillColor());
+            set(out, "radius", point.radius());
+            if ( point.symbol() != null ) out.put("symbol", point.symbol().toString());
+            return out;
+        } catch (JSONException ex) {
+            Log.e(ex);
             return null;
         }
-        JSObject out = (JSObject)c.get("{}");
-        set(out, "show", point.show());
-        set(out, "lineWidth", point.lineWidth());
-        set(out, "fill", point.fill());
-        if ( point.fillColor() != null ) set(out, "fillColor", point.fillColor());
-        set(out, "radius", point.radius());
-        if ( point.symbol() != null ) out.set("symbol", point.symbol().toString());
-        return out;
     }
     
-    private JSObject createOptionsObject(Options opts){
+    private JSONObject createOptionsObject(Options opts){
         if ( opts == null ){
             return null;
         }
-        JSObject out = (JSObject)c.get("{}");
+        JSONObject out = new JSONObject();
         set(out, "series", createSeriesObject(opts.series()));
         set(out, "legend", createLegendObject(opts.legend()));
         set(out, "grid", createGridObject(opts.grid()));
@@ -278,11 +306,11 @@ public class ChartView extends Container {
         return out;
     }
     
-    private JSObject createLegendObject(LegendOptions legend){
+    private JSONObject createLegendObject(LegendOptions legend){
         if ( legend == null ){
             return null;
         }
-        JSObject out = (JSObject)c.get("{}");
+        JSONObject out = new JSONObject();
         set(out, "show", legend.show());
         if ( legend.labelBoxBorderColor() != null ) set(out, "labelBoxBorderColor", legend.labelBoxBorderColor().toJS(c));
         set(out, "noColumns", legend.noColumns());
@@ -298,13 +326,13 @@ public class ChartView extends Container {
     
    
     
-    private JSObject createGridObject(GridOptions grid){
+    private JSONObject createGridObject(GridOptions grid){
         if ( grid == null ){
             return null;
             
         }
         
-        JSObject out = (JSObject)c.get("{}");
+        JSONObject out = new JSONObject();
         set(out, "show", grid.show());
         set(out, "aboveData", grid.aboveData());
         if ( grid.color() != null ) set(out, "color", grid.color().toJS(c));
@@ -321,29 +349,34 @@ public class ChartView extends Container {
         return out;
     }
     
-    private Object createBorderWidthsObject(BorderWidths widths){
-        if ( widths == null ){
+    private JSONObject createBorderWidthsObject(BorderWidths widths){
+        try {
+            if ( widths == null ){
+                return null;
+            }
+            Integer l = widths.left();
+            Integer r = widths.right();
+            Integer t = widths.top();
+            Integer b = widths.bottom();
+            
+            JSONObject out = new JSONObject();
+            out.put("left", l);
+            out.put("right", r);
+            out.put("top", t);
+            out.put("bottom", b);
+            return out;
+        } catch (JSONException ex) {
+            Log.e(ex);
             return null;
         }
-        Integer l = widths.left();
-        Integer r = widths.right();
-        Integer t = widths.top();
-        Integer b = widths.bottom();
-        
-        JSObject out = (JSObject)c.get("{}");
-        out.set("left", l);
-        out.set("right", r);
-        out.set("top", t);
-        out.set("bottom", b);
-        return out;
     }
     
-    private Object createBorderColorsObject(BorderColors colors){
+    private JSONObject createBorderColorsObject(BorderColors colors){
         if ( colors == null ){
             return null;
         }
         
-        JSObject out = (JSObject)c.get("{}");
+        JSONObject out = new JSONObject();
         if ( colors.top() != null ) set(out, "top", colors.top().toJS(c));
         if ( colors.left()!= null) set(out, "left", colors.left().toJS(c));
         if ( colors.bottom() != null ) set(out, "bottom", colors.bottom().toJS(c));

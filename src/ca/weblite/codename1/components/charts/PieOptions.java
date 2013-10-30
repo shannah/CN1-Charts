@@ -4,9 +4,9 @@
  */
 package ca.weblite.codename1.components.charts;
 
-import ca.weblite.codename1.js.JSObject;
-import ca.weblite.codename1.js.JavascriptContext;
+
 import static ca.weblite.codename1.components.charts.JSUtil.set;
+import org.json.me.JSONObject;
 
 /**
  *
@@ -26,8 +26,8 @@ public class PieOptions  {
         public ShadowOptions alpha(Double alpha){this.alpha=alpha; return this;}
         public Double alpha(){return alpha;}
         
-        JSObject toJS(JavascriptContext c){
-            JSObject out = (JSObject)c.get("{}");
+        JSONObject toJS(Object c){
+            JSONObject out = new JSONObject();
             set(out, "top", top);
             set(out, "left", left);
             set(out, "alpha", alpha);
@@ -45,8 +45,8 @@ public class PieOptions  {
         public OffsetOptions left(Integer left){this.left=left; return this;}
         public Integer left(){return left;}
         
-        JSObject toJS(JavascriptContext c){
-            JSObject out = (JSObject)c.get("{}");
+        JSONObject toJS(Object c){
+            JSONObject out = new JSONObject();
             set(out, "top", top);
             set(out, "left", left);
             return out;
@@ -62,8 +62,8 @@ public class PieOptions  {
         public StrokeOptions width(Integer width){this.width=width; return this;}
         public Integer width(){return width;}
         
-        JSObject toJS(JavascriptContext c){
-            JSObject out = (JSObject)c.get("{}");
+        JSONObject toJS(Object c){
+            JSONObject out = new JSONObject();
             if ( color != null ) set(out, "color", color.toJS(c));
             set(out, "width", width);
             return out;
@@ -83,8 +83,8 @@ public class PieOptions  {
         public LabelOptions threshold(Double threshold){this.threshold=threshold; return this;}
         public Double threshold(){return threshold;}
         
-        Object toJS(JavascriptContext c){
-            JSObject out = (JSObject)c.get("{}");
+        JSONObject toJS(Object c){
+            JSONObject out = new JSONObject();
             set(out, "show", show);
             set(out, "radius", radius);
             set(out, "threshold", threshold);
@@ -105,8 +105,8 @@ public class PieOptions  {
         public String label(){return label;}
         
         
-        Object toJS(JavascriptContext c){
-            JSObject out = (JSObject)c.get("{}");
+        JSONObject toJS(Object c){
+            JSONObject out = new JSONObject();
             set(out, "threshold", threshold);
             set(out, "color", color.toJS(c));
             set(out, "label", label);
@@ -130,8 +130,8 @@ public class PieOptions  {
 
     private Double highlightOpacity;
     
-    Object toJS(JavascriptContext c){
-        JSObject out = (JSObject)c.get("{}");
+    JSONObject toJS(Object c){
+        JSONObject out = new JSONObject();
         set(out, "show", show);
         set(out, "radius", radius);
         set(out, "innerRadius", innerRadius);
@@ -142,7 +142,7 @@ public class PieOptions  {
         if ( stroke != null ) set(out, "stroke", stroke.toJS(c));
         if ( label != null ) set(out, "label", label.toJS(c));
         if ( backgroundColor != null ){
-            JSObject bg = (JSObject)c.get("{}");
+            JSONObject bg = new JSONObject();
             set(bg, "color", backgroundColor.stringVal());
             set(bg, "opacity", backgroundColor.opacity());
             set(out, "background", bg);

@@ -4,16 +4,23 @@
  */
 package ca.weblite.codename1.components.charts;
 
-import ca.weblite.codename1.js.JSObject;
+import com.codename1.io.Log;
+import org.json.me.JSONException;
+import org.json.me.JSONObject;
+
 
 /**
  *
  * @author shannah
  */
 class JSUtil {
-    static void set(JSObject o, String key, Object value){
+    static void set(JSONObject o, String key, Object value){
         if ( value != null ){
-            o.set(key, value);
+            try {
+                o.put(key, value);
+            } catch (JSONException ex) {
+                Log.e(ex);
+            }
         }
     }
 }
