@@ -14,8 +14,9 @@ and exposing it's configuration options and methods as a Java API.
 
 ##Requirements
 
-1. [The Codename One Javascript Bridge](https://github.com/shannah/CodenameOneJS)
-2. [Codename One](http://www.codenameone.com/) 1.0 or higher
+[Codename One](http://www.codenameone.com/) 1.0 or higher
+
+(Previous builds required the CodenameOne Javascript bridge but this requirement has been removed).
 
 ##Platform Compatibility
 
@@ -30,8 +31,8 @@ and exposing it's configuration options and methods as a Java API.
 
 ##Installation
 
-1. Copy the [CN1Charts.cn1lib](https://github.com/shannah/CN1-Charts/raw/master/dist/CN1Charts.cn1lib) library into your project's lib directory.
-2. Install the [Codename One Javascript Bridge](https://github.com/shannah/CodenameOneJS)
+Copy the [CN1Charts.cn1lib](https://github.com/shannah/CN1-Charts/raw/master/dist/CN1Charts.cn1lib) library into your project's lib directory.
+
 
 ##Usage
 
@@ -119,6 +120,7 @@ to look at examples of the Flot javascript library and translate them directly t
 
 * [Javadocs](https://rawgithub.com/shannah/CN1-Charts/master/dist/javadoc/index.html)
 * [Flot Documentation](https://github.com/flot/flot/blob/master/API.md)
+* [Sample Application](https://github.com/shannah/CN1-Charts-Sample-App)
 
 ##Contact
 
