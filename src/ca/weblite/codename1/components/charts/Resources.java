@@ -44,7 +44,7 @@ class Resources {
         sb.append("            \n");
         sb.append("        </div>\n");
         sb.append("        <script>\n");
-        sb.append("            var flot = null;\n");
+        sb.append("            var flot = null; var plotClicked=function(){}; var plotHovered=function(){};\n");
         sb.append("            function init(data, options){\n");
         sb.append("                flot = null; $('#flot').text(''); $('#flot').height($(window).height());\n");
         sb.append("                $('#flot').width($(window).width());\n");
@@ -55,7 +55,9 @@ class Resources {
         sb.append("                    flot.setData(data);\n");
         sb.append("                    flot.draw();\n");
         sb.append("                }\n");
-        sb.append("                \n");
+        sb.append("                \n"
+                + "                 $('#flot').bind('plotclick', function(e,p,i){if ( window.plotClicked !== undefined ) window.plotClicked(e,p,i);});"
+                + "                 $('#flot').bind('plothover', plotHovered);");
         sb.append("                return flot;\n");
         sb.append("            }\n");
         sb.append("            \n");

@@ -8,7 +8,12 @@ package ca.weblite.codename1.components.charts;
 
 //import ca.weblite.codename1.js.JSObject;
 //import ca.weblite.codename1.js.JavascriptContext;
+import ca.weblite.codename1.components.charts.event.ChartEvent;
+import ca.weblite.codename1.components.charts.event.ChartListener;
 import com.codename1.io.Log;
+import com.codename1.javascript.JSFunction;
+import com.codename1.javascript.JSObject;
+import com.codename1.javascript.JavascriptContext;
 import com.codename1.ui.BrowserComponent;
 import com.codename1.ui.Container;
 import com.codename1.ui.Display;
@@ -16,6 +21,7 @@ import com.codename1.ui.events.ActionEvent;
 import com.codename1.ui.events.ActionListener;
 
 import com.codename1.ui.layouts.BorderLayout;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.me.JSONArray;
@@ -27,7 +33,7 @@ import org.json.me.JSONObject;
  * @author shannah
  */
 public class ChartView extends Container {
-    
+    List<ChartListener> chartListeners = new ArrayList<ChartListener>();
     private BrowserComponent browser;
     //private JSObject flotChart;
     private Object lock = new Object();
@@ -35,12 +41,17 @@ public class ChartView extends Container {
     private boolean initializationError = false;
     private Exception initializationException = null;
     private Chart chartModel;
-    //private JavascriptContext c;
-    Object c;
+    private JavascriptContext c;
+    private String jsChartConfig, jsOptionsConfig;
     
     public ChartView(Chart model){
         this.chartModel = model;
         
+    }
+    
+    public ChartView(String jsChartConfig, String jsOptionsConfig){
+        this.jsChartConfig = jsChartConfig;
+        this.jsOptionsConfig = jsOptionsConfig;
     }
     
     
@@ -54,6 +65,81 @@ public class ChartView extends Container {
     }
     
     
+    public void addChartListener(ChartListener l){
+        chartListeners.add(l);
+    }
+    
+    public void removeChartListener(ChartListener l){
+        chartListeners.remove(l);
+    }
+    
+    protected void firePlotHovered(ChartEvent evt){
+        for ( ChartListener l : chartListeners ){
+            l.plotHovered(evt);
+        }
+    }
+    
+    protected void firePlotClicked(ChartEvent evt){
+        for ( ChartListener l : chartListeners ){
+            l.plotClicked(evt);
+        }
+    }
+    
+    
+    private ChartEvent buildEvent(JSObject pos, JSObject item){
+        final ChartEvent evt = new ChartEvent(ChartView.this);
+        if ( pos != null ){
+            double x = -1; double y = -1;
+            try {
+                x = pos.getDouble("x");
+                y = pos.getDouble("y");
+            } catch (NullPointerException npe){}
+            Point pt = new Point(x, y);
+            List<Point> points = new ArrayList<Point>();
+            points.add(pt);
+            evt.setAxisPoints(points);
+        }
+        if ( item != null ){
+            
+            JSObject series = item.getObject("series");
+            if ( series != null ){
+                Series s = new Series();
+                s.color(new Color(series.getString("color")))
+                        .label(series.getString("label"))
+                        ;
+                evt.setSeries(s);
+                evt.setSeriesIndex(item.getInt("seriesIndex"));
+            }
+
+            JSObject dataPoints = item.getObject("datapoint");
+            if ( dataPoints != null ){
+                int len = dataPoints.getInt("length");
+                if ( len > 0 ){
+                    Object dataPoint = dataPoints.get(0);
+                    if ( dataPoint != null ){
+                        Point dataPoint0 = new Point(0,0);
+                        if ( dataPoint instanceof Double ){
+                            dataPoint0 = new Point((Double)dataPoint, 0);
+                        } else if ( dataPoint instanceof JSObject ){
+                            JSObject jdataPoint = (JSObject)dataPoint;
+                            dataPoint0 = new Point(jdataPoint.getDouble("x"), jdataPoint.getDouble("y"));
+                        }
+                        
+                        evt.setDataPoint(dataPoint0);
+                        evt.setDataPointIndex(item.getInt("dataIndex"));
+                    }
+
+                }
+            }
+            try {
+                evt.setPageX(item.getInt("pageX"));
+                evt.setPageY(item.getInt("pageY"));
+            } catch ( NullPointerException npe){}
+
+
+        }
+        return evt;
+    }
     
     private void init(final Runnable afterInit){
         Display.getInstance().setProperty("WebLoadingHidden", "true");
@@ -66,14 +152,61 @@ public class ChartView extends Container {
 
             public void actionPerformed(ActionEvent evt) {
                 try {
-                    //c = new JavascriptContext(browser);
+                    c = new JavascriptContext(browser);
                     
-                    //JSObject window = (JSObject)c.get("window");
+                    //
                     //JSObject jsChartModel = (JSObject)c.get(createDataObject(chartModel).toString());
                     //JSObject jsChartModelOptions = (JSObject)c.get(createOptionsObject(chartModel.options()).toString());
                     //flotChart = (JSObject)window.call("init", new Object[]{jsChartModel,  jsChartModelOptions});
                     
-                    browser.execute("init("+createDataObject(chartModel).toString()+","+createOptionsObject(chartModel.options()).toString()+");");
+                    String chartConfigStr = null;
+                    String optionsConfigStr = null;
+                    if ( chartModel != null ){
+                        chartConfigStr = createDataObject(chartModel).toString();
+                        optionsConfigStr = createOptionsObject(chartModel.options()).toString();
+                    } else {
+                        chartConfigStr = jsChartConfig;
+                        optionsConfigStr = jsOptionsConfig;
+                    }
+                    JSObject window = (JSObject)c.get("window");
+                    window.set("plotClicked", new JSFunction(){
+
+                        public void apply(JSObject self, Object[] args) {
+                            JSObject pos = (JSObject)args[1];
+                            JSObject item  = (JSObject)args[2];
+                            final ChartEvent evt = buildEvent(pos, item);
+                            Display.getInstance().callSerially(new Runnable(){
+
+                                public void run() {
+                                    firePlotClicked(evt);
+                                }
+
+                            });
+                        }
+                        
+                    });
+                    
+                    window.set("plotHovered", new JSFunction(){
+
+                        public void apply(JSObject self, Object[] args) {
+                            JSObject pos = (JSObject)args[1];
+                            JSObject item  = (JSObject)args[2];
+                            final ChartEvent evt = buildEvent(pos, item);
+                            
+                            Display.getInstance().callSerially(new Runnable(){
+
+                                public void run() {
+                                    firePlotHovered(evt);
+                                }
+
+                            });
+                        }
+                        
+                    });
+                    browser.execute("init("+chartConfigStr+","+optionsConfigStr+");");
+                    
+                    
+                    
                     initialized = true;
                     
                 } catch ( Exception ex){
