@@ -24,6 +24,7 @@ public class ChartEvent  {
     private Point dataPoint;
     private int seriesIndex, dataPointIndex, pageX, pageY;
     private List<Point> axisPoints = new ArrayList<Point>();
+    private double percent;
     
     public ChartEvent(ChartView source) {
         this.source = source;
@@ -139,6 +140,20 @@ public class ChartEvent  {
      */
     public void setSource(ChartView source) {
         this.source = source;
+    }
+
+    /**
+     * @return the percent
+     */
+    public double getPercent() {
+        return percent;
+    }
+
+    /**
+     * @param percent the percent to set
+     */
+    public void setPercent(double percent) {
+        this.percent = percent;
     }
     
     

@@ -109,6 +109,13 @@ public class ChartView extends Container {
                         ;
                 evt.setSeries(s);
                 evt.setSeriesIndex(item.getInt("seriesIndex"));
+                
+                try {
+                    double percent = series.getDouble("percent");
+                    evt.setPercent(percent);
+                } catch ( NullPointerException npe){
+                    
+                }
             }
 
             JSObject dataPoints = item.getObject("datapoint");
